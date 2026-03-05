@@ -1,372 +1,1069 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Careers — Configgo.com</title>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configgo — Sales Training Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-    :root {
-      --bg:             #F7F7F5;
-      --surface:        #FFFFFF;
-      --border:         #E8E8E4;
-      --text-primary:   #111110;
-      --text-secondary: #6B6B67;
-      --accent:         #1A1A18;
-      --pill-bg:        #EEEEED;
-      --pill-text:      #3A3A38;
-      --active-bg:      #F0F0EE;
-      --active-border:  #111110;
-      --sidebar-w:      300px;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-pill: 100px;
-    }
+  <!-- ▸ FIREBASE SDK (compat v9) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script>
+    /* ================================================================
+       FIREBASE CONFIG — Replace with your own values from:
+       Firebase Console → Project Settings → Your Apps → Web App
+       ================================================================ */
+    const firebaseConfig = {
+      apiKey:            "AIzaSyAzVWeWmTzUmxM5VRMssW3gffRBhUpDsLo",
+      authDomain:        "configgo-onboarding.firebaseapp.com",
+      projectId:         "configgo-onboarding",
+      storageBucket:     "configgo-onboarding.firebasestorage.app",
+      messagingSenderId: "345821305751",
+      appId:             "1:345821305751:web:b9a0cdc527e5560a2a82d2",
+      measurementId:     "G-QVFEFD5MHC"
+    };
+    firebase.initializeApp(firebaseConfig);
 
-    html, body {
-      height: 100%;
-      font-family: 'Manrope', sans-serif;
-      background: var(--bg);
-      color: var(--text-primary);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── LAYOUT ── */
-    .layout {
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: var(--sidebar-w);
-      min-width: var(--sidebar-w);
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .sidebar-header {
-      padding: 28px 24px 20px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .brand {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-    }
-
-    .sidebar-title {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-      line-height: 1.2;
-      margin-bottom: 4px;
-    }
-
-    .sidebar-count {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-secondary);
-    }
-
-    .sidebar-count span {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      background: var(--accent);
-      color: white;
-      border-radius: 50%;
-      font-size: 10px;
-      font-weight: 700;
-      margin-right: 5px;
-    }
-
-    /* ── JOB LIST ── */
-    .job-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .job-list::-webkit-scrollbar { width: 4px; }
-    .job-list::-webkit-scrollbar-track { background: transparent; }
-    .job-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    .job-item {
-      padding: 14px 14px;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: background 0.12s ease, border-color 0.12s ease;
-      position: relative;
-    }
-
-    .job-item:hover {
-      background: var(--active-bg);
-    }
-
-    .job-item.active {
-      background: var(--active-bg);
-      border-color: var(--border);
-    }
-
-    .job-item.active::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 8px; bottom: 8px;
-      width: 3px;
-      background: var(--accent);
-      border-radius: 0 2px 2px 0;
-    }
-
-    .job-item-title {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-      line-height: 1.3;
-    }
-
-    .job-item-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-
-    .job-tag {
-      display: inline-flex;
-      align-items: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      background: var(--pill-bg);
-      padding: 3px 8px;
-      border-radius: var(--radius-pill);
-      white-space: nowrap;
-    }
-
-    .job-tag.green {
-      background: #ECFDF3;
-      color: #15803D;
-    }
-
-    /* ── SIDEBAR FOOTER ── */
-    .sidebar-footer {
-      padding: 16px 24px;
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .sidebar-footer p {
-      font-size: 11.5px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    .sidebar-footer a {
-      color: var(--text-primary);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    /* ── MAIN CONTENT ── */
-    .main {
-      flex: 1;
-      overflow-y: auto;
-      background: var(--bg);
-      position: relative;
-    }
-
-    .main::-webkit-scrollbar { width: 6px; }
-    .main::-webkit-scrollbar-track { background: transparent; }
-    .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    /* iframe fills the main area */
-    .job-frame {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
-
-    /* ── WELCOME STATE ── */
-    .welcome {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      gap: 12px;
-      padding: 40px;
-      text-align: center;
-    }
-
-    .welcome-icon {
-      width: 52px; height: 52px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 4px;
-    }
-
-    .welcome h2 {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-primary);
-      letter-spacing: -0.01em;
-    }
-
-    .welcome p {
-      font-size: 13.5px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      max-width: 280px;
-      line-height: 1.6;
-    }
-
-    /* ── MOBILE ── */
-    @media (max-width: 700px) {
-      .layout {
-        flex-direction: column;
-        height: auto;
-        overflow: visible;
+    // Auth guard — redirect to login if not signed in
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = 'login.html';
+      } else {
+        // Show user email in header
+        const el = document.getElementById('user-email');
+        if (el) el.textContent = user.email;
       }
-
-      .sidebar {
-        width: 100%;
-        min-width: 100%;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .job-list {
-        flex-direction: row;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 10px 12px;
-        gap: 8px;
-        flex-wrap: nowrap;
-      }
-
-      .job-item {
-        min-width: 200px;
-        flex-shrink: 0;
-      }
-
-      .main {
-        height: calc(100vh - 180px);
-        min-height: 500px;
-      }
-
-      .job-frame { height: 100%; }
-    }
-  </style>
+    });
+  </script>
 </head>
 <body>
-<div class="layout">
 
-  <!-- ── SIDEBAR ── -->
-  <aside class="sidebar">
+<!-- ============================================================ HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M26.8238 8.125H16.128C15.9436 8.125 15.7939 8.27512 15.7939 8.46008V11.3769V11.5619V18.4369V21.5399C15.7939 21.7249 15.9436 21.875 16.128 21.875H19.2207H29.916C30.1005 21.875 30.2501 21.7249 30.2501 21.5399V18.9733V18.4382V11.5632V8.46008C30.2501 8.27512 30.1005 8.125 29.916 8.125H26.8238ZM26.8251 15.6611V15.6383L26.8238 18.2416C26.8238 18.3491 26.7368 18.4364 26.6295 18.4364H19.4154C19.3082 18.4364 19.2211 18.3491 19.2211 18.2416V11.5632L19.2194 14.1466V13.4231L19.2207 11.758C19.2207 11.6505 19.3077 11.5632 19.415 11.5632H26.6291C26.7363 11.5632 26.8234 11.6505 26.8234 11.758V18.4364L26.8251 15.6611Z" fill="#0A0A0A"/>
+        <path d="M14.4562 11.3016V8.38696C14.4562 8.24243 14.3395 8.125 14.195 8.125H0.261187C0.116655 8.125 0 8.242 0 8.38696V11.3003C0 11.4449 0.116655 11.5619 0.260758 11.5623L2.5248 11.5632C2.75897 11.5632 2.87648 11.8475 2.71051 12.0135L0.0763403 14.6555C0.0274482 14.7045 0 14.7712 0 14.8404V21.6135C0 21.758 0.116655 21.8755 0.261187 21.8755H3.29164H3.42674H6.56269C6.65576 21.8755 6.74196 21.8256 6.78871 21.7447L10.5435 15.2336C10.6782 15 11.0342 15.0959 11.0342 15.3656V21.6135C11.0342 21.758 11.1508 21.8755 11.2954 21.8755H14.1954C14.3395 21.8755 14.4566 21.7585 14.4566 21.6135V14.4352C14.4566 14.2907 14.34 14.1733 14.1954 14.1733H11.1551H11.0346H7.88364C7.79057 14.1733 7.70436 14.2232 7.65762 14.304L3.91737 20.7898C3.7827 21.0233 3.42674 20.9274 3.42674 20.6577V11.8273C3.42674 11.6814 3.54468 11.5636 3.68964 11.5636H14.195C14.3395 11.5632 14.4562 11.4462 14.4562 11.3016Z" fill="#0A0A0A"/>
+      </svg>
+    </div>
+    Configgo Technology
+  </div>
+  <div class="header-badge">
+    <span class="badge-dot"></span>
+    <span class="lang-en">Sales Training Hub</span>
+    <span class="lang-tr">Satış Eğitim Merkezi</span>
+  </div>
+  <div class="header-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" data-lang="tr" onclick="setLang('tr')">TR</button>
+    </div>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark mode">
+      <!-- Moon = shown in dark mode -->
+      <span class="icon-moon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13.5 10.5A6 6 0 0 1 5.5 2.5a6 6 0 1 0 8 8Z" fill="currentColor"/>
+        </svg>
+      </span>
+      <!-- Sun = shown in light mode -->
+      <span class="icon-sun">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="3" fill="currentColor"/>
+          <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.42 1.42M11.53 11.53l1.42 1.42M3.05 12.95l1.42-1.42M11.53 4.47l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </span>
+    </button>
+    <button class="quick-ref-btn" onclick="openQR()">
+      ⚡ <span class="lang-en">Quick Ref</span><span class="lang-tr">Hızlı Ref</span>
+    </button>
+    <div class="user-info">
+      <span class="user-email" id="user-email"></span>
+      <button class="logout-btn" onclick="logout()" title="Sign out">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span class="lang-en">Logout</span>
+        <span class="lang-tr">Çıkış</span>
+      </button>
+    </div>
+  </div>
+</header>
 
-    <div class="sidebar-header">
-      <div class="brand">configgo.com</div>
-      <div class="sidebar-title">We're Hiring</div>
-      <div class="sidebar-count">
-        <span>3</span> open positions
+<div class="app-body">
+
+<!-- ============================================================ SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-section-label lang-en">Navigation</div>
+  <div class="sidebar-section-label lang-tr">Menü</div>
+  <ul class="nav-list">
+    <li class="nav-item">
+      <button class="nav-btn active" onclick="showTab('tab1',this)" data-tab="tab1">
+        <div class="nav-icon">📞</div>
+        <div class="nav-text">
+          <span class="nav-num">Tab 01</span>
+          <span class="nav-title lang-en">Cold Call Script</span>
+          <span class="nav-title lang-tr">Soğuk Arama</span>
+        </div>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-btn" onclick="showTab('tab2',this)" data-tab="tab2">
+        <div class="nav-icon">🛡️</div>
+        <div class="nav-text">
+          <span class="nav-num">Tab 02</span>
+          <span class="nav-title lang-en">Rejection Handling</span>
+          <span class="nav-title lang-tr">İtiraz Yönetimi</span>
+        </div>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-btn" onclick="showTab('tab3',this)" data-tab="tab3">
+        <div class="nav-icon">🤝</div>
+        <div class="nav-text">
+          <span class="nav-num">Tab 03</span>
+          <span class="nav-title lang-en">Partnership Call</span>
+          <span class="nav-title lang-tr">Partnerlik Araması</span>
+        </div>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-btn" onclick="showTab('tab4',this)" data-tab="tab4">
+        <div class="nav-icon">📦</div>
+        <div class="nav-text">
+          <span class="nav-num">Tab 04</span>
+          <span class="nav-title lang-en">Product Knowledge</span>
+          <span class="nav-title lang-tr">Ürün Bilgisi</span>
+        </div>
+      </button>
+    </li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="progress-label lang-en">Onboarding Progress</div>
+    <div class="progress-label lang-tr">İlerleme</div>
+    <div class="progress-dots">
+      <div class="progress-dot" id="dot-tab1"></div>
+      <div class="progress-dot" id="dot-tab2"></div>
+      <div class="progress-dot" id="dot-tab3"></div>
+      <div class="progress-dot" id="dot-tab4"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================ MAIN -->
+<main class="main-content">
+
+<!-- ======================================================== TAB 1 -->
+<div id="tab1" class="tab-panel active">
+  <div class="tab-header">
+    <div class="lang-en">
+      <div class="tab-badge">📞 Script 01 + 02 — Enhanced with NEPQ</div>
+      <h1 class="tab-title">B2B Cold Call Script</h1>
+      <p class="tab-subtitle">For real estate & construction companies. Goal: book a 15-minute demo — never sell on the first call.</p>
+    </div>
+    <div class="lang-tr">
+      <div class="tab-badge">📞 Script 01 + 02 — NEPQ ile Geliştirilmiş</div>
+      <h1 class="tab-title">B2B Soğuk Arama Scripti</h1>
+      <p class="tab-subtitle">İnşaat ve gayrimenkul firmaları için. Hedef: 15 dakikalık demo toplantısı — ilk aramada asla satış yapma.</p>
+    </div>
+  </div>
+
+  <!-- Flow Stepper -->
+  <div class="flow-stepper" id="stepper-tab1">
+    <div class="flow-step current" data-step="0">
+      <div class="flow-step-circle">1</div>
+      <div class="flow-step-text lang-en">Pattern Interrupt</div>
+      <div class="flow-step-text lang-tr">Desen Kırıcı</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step" data-step="1">
+      <div class="flow-step-circle">2</div>
+      <div class="flow-step-text lang-en">Authority Check</div>
+      <div class="flow-step-text lang-tr">Yetkili Kişi</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step" data-step="2">
+      <div class="flow-step-circle">3</div>
+      <div class="flow-step-text lang-en">Problem Discovery</div>
+      <div class="flow-step-text lang-tr">Problem Keşfi</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step" data-step="3">
+      <div class="flow-step-circle">4</div>
+      <div class="flow-step-text lang-en">Deepen Pain</div>
+      <div class="flow-step-text lang-tr">Problemi Derinleştir</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step" data-step="4">
+      <div class="flow-step-circle">5</div>
+      <div class="flow-step-text lang-en">Social Proof + Pitch</div>
+      <div class="flow-step-text lang-tr">Sosyal Kanıt + Pitch</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step" data-step="5">
+      <div class="flow-step-circle">6</div>
+      <div class="flow-step-text lang-en">Book the Meeting</div>
+      <div class="flow-step-text lang-tr">Toplantı Rezervasyonu</div>
+    </div>
+  </div>
+
+  <!-- Teleprompter Controls -->
+  <div class="tp-controls">
+    <button class="tp-toggle" id="tp-btn-tab1" onclick="toggleTP('tab1')">
+      ▶ <span class="lang-en">Teleprompter Mode</span><span class="lang-tr">Teleprompter Modu</span>
+    </button>
+    <div class="tp-nav" id="tp-nav-tab1">
+      <button class="tp-nav-btn" id="tp-prev-tab1" onclick="tpMove('tab1',-1)" disabled>← <span class="lang-en">Prev</span><span class="lang-tr">Geri</span></button>
+      <span class="tp-counter" id="tp-count-tab1">1 / 6</span>
+      <button class="tp-nav-btn" id="tp-next-tab1" onclick="tpMove('tab1',1)"><span class="lang-en">Next</span><span class="lang-tr">İleri</span> →</button>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps-container" id="steps-tab1">
+
+    <!-- STEP 1 -->
+    <div class="step tp-active" data-step-index="0">
+      <div class="step-header">
+        <span class="step-num">01</span>
+        <h3 class="step-title lang-en">Pattern Interrupt</h3>
+        <h3 class="step-title lang-tr">Desen Kırıcı</h3>
+        <span class="step-chip lang-en">Break the ice</span>
+        <span class="step-chip lang-tr">Bağlantı kur</span>
+      </div>
+      <div class="step-body">
+        <div class="lang-en">
+          <div class="stage-dir">📋 Pick up rhythm: slow, confident, warm. Don't sound like every other salesperson.</div>
+          <div class="script-line key">"Hey [Name] — you weren't expecting my call. Could I steal 30 seconds?"</div>
+          <div class="stage-dir">💬 If they say they're busy:</div>
+          <div class="script-line alt">"Totally — I'll be super quick. If it's not relevant, I won't call again."</div>
+          <div class="stage-dir">📧 If following up on an email you sent:</div>
+          <div class="script-line alt">"Hi [Name], I sent you a quick email about [Project Name] yesterday — did you get a chance to see it?"</div>
+        </div>
+        <div class="lang-tr">
+          <div class="stage-dir">📋 Tempo: yavaş, kendinden emin, sıcak. Diğer satıcılar gibi konuşma.</div>
+          <div class="script-line key">"Merhaba [İsim] — aramanızı beklemiyordunuz, biliyorum. 30 saniyenizi çalabilir miyim?"</div>
+          <div class="stage-dir">💬 Meşgulüm derlerse:</div>
+          <div class="script-line alt">"Anlıyorum, çok kısa tutacağım. Konuyla ilgili değilse bir daha aramam."</div>
+          <div class="stage-dir">📧 E-posta takibiyse:</div>
+          <div class="script-line alt">"Merhaba [İsim], dün [Proje adı] ile ilgili kısa bir e-posta atmıştım — bakma şansınız oldu mu?"</div>
+        </div>
       </div>
     </div>
 
-    <div class="job-list">
-
-      <!-- UX/UI Designer -->
-      <div class="job-item active" onclick="loadJob(this, 'ux-designer.html')" id="job-ux">
-        <div class="job-item-title">UX/UI Designer</div>
-        <div class="job-item-tags">
-          <span class="job-tag green">● Remote</span>
-          <span class="job-tag">Mid–Senior</span>
-          <span class="job-tag">Contractor</span>
+    <!-- STEP 2 -->
+    <div class="step" data-step-index="1">
+      <div class="step-header">
+        <span class="step-num">02</span>
+        <h3 class="step-title lang-en">Authority Check</h3>
+        <h3 class="step-title lang-tr">Yetkili Kişi Kontrolü</h3>
+        <span class="step-chip lang-en">Find the DM</span>
+        <span class="step-chip lang-tr">Karar vericiye ulaş</span>
+      </div>
+      <div class="step-body">
+        <div class="lang-en">
+          <div class="script-line key">"Quick question — for project development and sales partnerships, are you the right person or should I speak with someone else?"</div>
+          <div class="stage-dir">🔀 If not the DM:</div>
+          <div class="script-line alt">"No problem at all — could I get their name and number so I don't waste anyone's time?"</div>
+          <div class="stage-dir">⚠️ STOP if wrong person. Don't pitch to gatekeepers. Get the right contact first.</div>
+        </div>
+        <div class="lang-tr">
+          <div class="script-line key">"Hızlıca sormak istiyorum — proje geliştirme ve satış ortaklıkları konusunda yetkili kişi siz misiniz, yoksa başka biriyle mi görüşmem daha doğru olur?"</div>
+          <div class="stage-dir">🔀 Yetkili değilse:</div>
+          <div class="script-line alt">"Anlıyorum — kimsenin zamanını boşa harcamamak için o kişinin adını ve numarasını alabilir miyim?"</div>
+          <div class="stage-dir">⚠️ Yanlış kişiyse duruyorsun. Kapı bekçilerine pitch yapma. Önce doğru kişiye ulaş.</div>
         </div>
       </div>
-
-      <!-- Motion Designer -->
-      <div class="job-item" onclick="loadJob(this, 'motion-designer.html')" id="job-motion">
-        <div class="job-item-title">Motion Designer</div>
-        <div class="job-item-tags">
-          <span class="job-tag green">● Remote</span>
-          <span class="job-tag">Mid–Senior</span>
-          <span class="job-tag">After Effects</span>
-        </div>
-      </div>
-
-      <!-- Call Center -->
-      <div class="job-item" onclick="loadJob(this, 'cagri-merkezi.html')" id="job-cc">
-        <div class="job-item-title">Çağrı Merkezi Satış Temsilcisi</div>
-        <div class="job-item-tags">
-          <span class="job-tag green">● Uzaktan</span>
-          <span class="job-tag">Tam Zamanlı</span>
-          <span class="job-tag">Ankara / İst.</span>
-        </div>
-      </div>
-
     </div>
 
-    <div class="sidebar-footer">
-      <p>Don't see the right role?<br/>
-        Email us at <a href="mailto:zehra.akcali@configgo.com">zehra.akcali@configgo.com</a>
-      </p>
+    <!-- STEP 3 -->
+    <div class="step" data-step-index="2">
+      <div class="step-header">
+        <span class="step-num">03</span>
+        <h3 class="step-title lang-en">Problem Discovery</h3>
+        <h3 class="step-title lang-tr">Problem Keşfi</h3>
+        <span class="step-chip lang-en">NEPQ Situation</span>
+        <span class="step-chip lang-tr">NEPQ Durum Sorusu</span>
+      </div>
+      <div class="step-body">
+        <div class="lang-en">
+          <div class="script-line key">"I'll be honest with you — I'm calling because most construction firms in [City] are dealing with the same two issues: render quality and model costs. For your current project — which is the bigger headache right now?"</div>
+          <div class="branch-section">
+            <div class="branch-heading">Choose the prospect's response:</div>
+            <div class="branch-options">
+              <button class="branch-btn" onclick="selectBranch(this,'b1-en-a')"><span class="branch-key">A</span> Both are a problem</button>
+              <button class="branch-btn" onclick="selectBranch(this,'b1-en-b')"><span class="branch-key">B</span> Budget / Model cost</button>
+              <button class="branch-btn" onclick="selectBranch(this,'b1-en-c')"><span class="branch-key">C</span> Render quality</button>
+              <button class="branch-btn" onclick="selectBranch(this,'b1-en-d')"><span class="branch-key">D</span> Neither — we're happy</button>
+            </div>
+            <div class="branch-responses">
+              <div class="branch-resp" id="b1-en-a">
+                <div class="branch-resp-label">Response to A</div>
+                <div class="script-line key">"Got it — you're not alone. What's your typical budget per project for models and renders combined?"</div>
+              </div>
+              <div class="branch-resp" id="b1-en-b">
+                <div class="branch-resp-label">Response to B</div>
+                <div class="script-line key">"Understood. Companies in [City] are spending ₺800K+ on physical models. What are you averaging? And what have you tried to bring that down?"</div>
+              </div>
+              <div class="branch-resp" id="b1-en-c">
+                <div class="branch-resp-label">Response to C</div>
+                <div class="script-line key">"I get it — render quality directly affects how buyers perceive the project before it's built. What alternatives have you explored so far?"</div>
+              </div>
+              <div class="branch-resp" id="b1-en-d">
+                <div class="branch-resp-label">Response to D — Pivot to Social Proof</div>
+                <div class="script-line key">"That's actually great to hear — most aren't. Can I ask one quick thing though?"</div>
+                <div class="stage-dir">→ Continue to Step 4 with: "How long has that been working well for you?"</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="lang-tr">
+          <div class="script-line key">"Dürüst olayım — [Şehir]'deki inşaat firmalarının çoğu aynı iki sorunla uğraşıyor: render kalitesi ve maket maliyeti. Şu anki projenizde hangisi daha büyük bir baş ağrısı?"</div>
+          <div class="branch-section">
+            <div class="branch-heading">Muhatabın cevabını seçin:</div>
+            <div class="branch-options">
+              <button class="branch-btn" onclick="selectBranch(this,'b1-tr-a')"><span class="branch-key">A</span> İkisi de problem</button>
+              <button class="branch-btn" onclick="selectBranch(this,'b1-tr-b')"><span class="branch-key">B</span> Bütçe / Maket maliyeti</button>
+              <button class="branch-btn" onclick="selectBranch(this,'b1-tr-c')"><span class="branch-key">C</span> Render kalitesi</button>
+              <button class="branch-btn" onclick="selectBranch(this,'b1-tr-d')"><span class="branch-key">D</span> Hiçbiri — memnunuz</button>
+            </div>
+            <div class="branch-responses">
+              <div class="branch-resp" id="b1-tr-a">
+                <div class="branch-resp-label">A Cevabı</div>
+                <div class="script-line key">"Yalnız değilsiniz. Proje başına maket ve render için ortalama ne kadar bütçe ayırıyorsunuz?"</div>
+              </div>
+              <div class="branch-resp" id="b1-tr-b">
+                <div class="branch-resp-label">B Cevabı</div>
+                <div class="script-line key">"Anladım. [Şehir]'deki firmalar fiziksel makete 800.000 TL+ harcamak zorunda kalıyor. Siz ne kadar harcıyorsunuz? Bunu düşürmek için ne denediniz?"</div>
+              </div>
+              <div class="branch-resp" id="b1-tr-c">
+                <div class="branch-resp-label">C Cevabı</div>
+                <div class="script-line key">"Anlıyorum — render kalitesi, müşterilerin projeyi henüz inşaat başlamadan nasıl algıladığını doğrudan etkiliyor. Şimdiye kadar ne gibi alternatifler araştırdınız?"</div>
+              </div>
+              <div class="branch-resp" id="b1-tr-d">
+                <div class="branch-resp-label">D Cevabı — Sosyal Kanıt Pivotu</div>
+                <div class="script-line key">"Harika, azınlıktasınız gerçekten. Yine de hızlı bir sorum olacak..."</div>
+                <div class="stage-dir">→ 4. adıma geç: "Bu ne zamandır böyle çalışıyor?"</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-  </aside>
+    <!-- STEP 4 -->
+    <div class="step" data-step-index="3">
+      <div class="step-header">
+        <span class="step-num">04</span>
+        <h3 class="step-title lang-en">Deepen the Pain</h3>
+        <h3 class="step-title lang-tr">Problemi Derinleştir</h3>
+        <span class="step-chip lang-en">NEPQ Consequence</span>
+        <span class="step-chip lang-tr">NEPQ Sonuç Sorusu</span>
+      </div>
+      <div class="step-body">
+        <div class="lang-en">
+          <div class="stage-dir">🎯 Let them talk. Take notes. DO NOT interrupt. Use silence strategically.</div>
+          <div class="script-line key">"How long has that been the situation?"</div>
+          <div class="script-line key">"And when that happens — when the model isn't ready or the renders don't land — what effect does it have on your sales team's ability to close?"</div>
+          <div class="script-line key">"If this continued for another 12 months, what would that cost the business?"</div>
+          <div class="stage-dir">💡 NEPQ principle: Make the prospect emotionally aware of the cost of inaction before you pitch anything.</div>
+        </div>
+        <div class="lang-tr">
+          <div class="stage-dir">🎯 Konuşmalarına izin ver. Not al. ASLA araya girme. Sessizliği stratejik kullan.</div>
+          <div class="script-line key">"Bu durum ne zamandır böyle?"</div>
+          <div class="script-line key">"Ve olduğunda — maket hazır olmadığında ya da renderlar beklentiyi karşılamadığında — satış ekibinizin kapatma kapasitesi nasıl etkileniyor?"</div>
+          <div class="script-line key">"Bu durum 12 ay daha devam etse, işe maliyeti ne olur?"</div>
+          <div class="stage-dir">💡 NEPQ prensibi: Pitch yapmadan önce muhatabın hareketsizliğin maliyetinin duygusal olarak farkına varmasını sağla.</div>
+        </div>
+      </div>
+    </div>
 
-  <!-- ── MAIN CONTENT ── -->
-  <main class="main">
-    <iframe
-      class="job-frame"
-      id="jobFrame"
-      src="ux-designer.html"
-      title="Job Posting">
-    </iframe>
-  </main>
+    <!-- STEP 5 -->
+    <div class="step" data-step-index="4">
+      <div class="step-header">
+        <span class="step-num">05</span>
+        <h3 class="step-title lang-en">Social Proof + Pitch</h3>
+        <h3 class="step-title lang-tr">Sosyal Kanıt + Konumlandırma</h3>
+        <span class="step-chip lang-en">Keep it sharp</span>
+        <span class="step-chip lang-tr">Kısa tut</span>
+      </div>
+      <div class="step-body">
+        <div class="lang-en">
+          <div class="stage-dir">📌 Transition line — connect their pain to your solution:</div>
+          <div class="script-line key">"That's exactly why I'm calling."</div>
+          <div class="script-line proof">"We're Configgo Technology — we work with 40+ projects across 10 cities in Turkey. Companies like Nata Holding, Shelton, TR Holding, and Zirve Beton use us."</div>
+          <div class="script-line proof">"What we've seen across those 40+ projects: firms using 3D interactive tours with a built-in CRM — instead of physical models and spreadsheets — hit their sales targets 4–6 months ahead of competitors."</div>
+          <div class="script-line proof">"Shelton in Ankara? They cut a ₺1,000,000 model budget to zero and started selling 8 weeks before their model was even ready — using Configgo."</div>
+          <div class="script-line key">"We combine 3D interactive project tours with a full sales CRM — leads, inventory, contracts, reporting — all in one place. And we're selective: this is really for firms running multiple projects with a serious sales operation. That's why I called you specifically."</div>
+        </div>
+        <div class="lang-tr">
+          <div class="stage-dir">📌 Geçiş cümlesi — acılarını çözümünüze bağlayın:</div>
+          <div class="script-line key">"Tam bu yüzden arıyorum."</div>
+          <div class="script-line proof">"Biz Configgo Teknoloji — Türkiye'de 10 ilde, 40'ın üzerinde projede çalışıyoruz. Nata Holding, Shelton, TR Holding, Zirve Beton gibi firmalar kullanıyor."</div>
+          <div class="script-line proof">"O 40+ projede gördük ki: fiziksel maket ve tablo yerine 3B interaktif turlar ve dahili CRM kullanan firmalar, rakiplerinden ortalama 4–6 ay önce satış hedeflerine ulaşıyor."</div>
+          <div class="script-line proof">"Ankara'daki Shelton? 1.000.000 TL'lik maket bütçesini sıfırladılar ve maket hazırlanmadan 8 hafta önce satışa başladılar — Configgo ile."</div>
+          <div class="script-line key">"3B interaktif proje turlarını tam bir satış CRM'iyle birleştiriyoruz — lead'ler, stok, sözleşmeler, raporlama — hepsi tek yerde. Seçici çalışıyoruz: bu gerçekten birden fazla proje yürüten, ciddi bir satış organizasyonu olan firmalar için. O yüzden özellikle sizi aradım."</div>
+        </div>
+      </div>
+    </div>
 
+    <!-- STEP 6 -->
+    <div class="step" data-step-index="5">
+      <div class="step-header">
+        <span class="step-num">06</span>
+        <h3 class="step-title lang-en">Book the Meeting</h3>
+        <h3 class="step-title lang-tr">Toplantı Rezervasyonu</h3>
+        <span class="step-chip lang-en">2-option close</span>
+        <span class="step-chip lang-tr">2 seçenek kapanışı</span>
+      </div>
+      <div class="step-body">
+        <div class="lang-en">
+          <div class="script-line key">"I'd love to put together a quick custom demo showing what this looks like for a project like yours — just 15 minutes on Zoom."</div>
+          <div class="script-line key">"This week I only have Thursday and Friday open. Would morning or afternoon work better for you?"</div>
+          <div class="stage-dir">✅ When they choose a time:</div>
+          <div class="script-line key">"Perfect — sending the calendar invite right now. What email address should I use?"</div>
+          <div class="stage-dir">📧 Send the invite immediately. Then confirm:</div>
+          <div class="script-line alt">"Just checking — did the notification come through?" [Wait for yes.] "Excellent. Looking forward to it. Have a great day!"</div>
+          <div class="stage-dir">💡 Optional closer before hanging up: "I'm also sending you a quick WhatsApp/SMS with a couple of client testimonials. Keep an eye out."</div>
+        </div>
+        <div class="lang-tr">
+          <div class="script-line key">"Projenize özel hazırladığımız 15 dakikalık bir demo ayarlamak istiyorum — Zoom üzerinden."</div>
+          <div class="script-line key">"Bu hafta sadece perşembe ve cuma müsaitim. Sabah mı yoksa öğleden sonra mı daha uygun?"</div>
+          <div class="stage-dir">✅ Zaman seçtiklerinde:</div>
+          <div class="script-line key">"Harika — takvim daveti hemen gönderiyorum. Hangi e-posta adresini kullanalım?"</div>
+          <div class="stage-dir">📧 Daveti hemen gönder. Ardından onayla:</div>
+          <div class="script-line alt">"Bildirimi aldınız mı?" [Evet derlerse.] "Mükemmel. Görüşmek üzere, iyi çalışmalar!"</div>
+          <div class="stage-dir">💡 Opsiyonel kapanış: "Size hemen WhatsApp/SMS'ten birkaç müşteri referansı da gönderiyorum, dikkat edin."</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /steps -->
+
+  <!-- Post-Call Checklist -->
+  <div class="checklist-card">
+    <div class="checklist-card-title">
+      ✅ <span class="lang-en">Post-Call Checklist</span><span class="lang-tr">Arama Sonrası Kontrol Listesi</span>
+    </div>
+    <div class="checklist-items" id="cl-tab1">
+      <label class="checklist-item"><div class="check-box"><span class="check-icon">✓</span></div><span class="check-text lang-en">Thank-you email sent immediately</span><span class="check-text lang-tr">Teşekkür e-postası hemen gönderildi</span></label>
+      <label class="checklist-item"><div class="check-box"><span class="check-icon">✓</span></div><span class="check-text lang-en">Customer testimonials sent (WhatsApp + email)</span><span class="check-text lang-tr">Müşteri referansları gönderildi (WhatsApp + e-posta)</span></label>
+      <label class="checklist-item"><div class="check-box"><span class="check-icon">✓</span></div><span class="check-text lang-en">1-day reminder email scheduled</span><span class="check-text lang-tr">1 gün öncesi hatırlatma e-postası planlandı</span></label>
+      <label class="checklist-item"><div class="check-box"><span class="check-icon">✓</span></div><span class="check-text lang-en">1-hour reminder email scheduled</span><span class="check-text lang-tr">1 saat öncesi hatırlatma e-postası planlandı</span></label>
+      <label class="checklist-item"><div class="check-box"><span class="check-icon">✓</span></div><span class="check-text lang-en">CRM updated with notes + next action</span><span class="check-text lang-tr">CRM notlar ve sonraki aksiyon ile güncellendi</span></label>
+    </div>
+  </div>
+</div><!-- /tab1 -->
+
+<!-- ======================================================== TAB 2 -->
+<div id="tab2" class="tab-panel">
+  <div class="tab-header">
+    <div class="lang-en">
+      <div class="tab-badge">🛡️ NEPQ + Pattern Interrupts</div>
+      <h1 class="tab-title">Rejection Handling</h1>
+      <p class="tab-subtitle">7 core objections in B2B cold calling. Never answer an objection — convert it into a question.</p>
+    </div>
+    <div class="lang-tr">
+      <div class="tab-badge">🛡️ NEPQ + Kalıp Kırıcılar</div>
+      <h1 class="tab-title">İtiraz Yönetimi</h1>
+      <p class="tab-subtitle">B2B soğuk aramada 7 temel itiraz. Bir itiraza cevap verme — onu soruya dönüştür.</p>
+    </div>
+  </div>
+
+  <!-- Secret Rule callout -->
+  <div class="secret-rule">
+    <div class="secret-rule-title lang-en">🔑 The Secret Rule of Objections</div>
+    <div class="secret-rule-title lang-tr">🔑 İtirazların Gizli Kuralı</div>
+    <div class="secret-rule-text lang-en"><strong>Don't answer objections. Convert them into questions.</strong><br>Example: Prospect says "We already have a CRM." — Wrong: "Ours is better." — Right: "Interesting — what made you choose that one originally?"</div>
+    <div class="secret-rule-text lang-tr"><strong>İtirazlara cevap verme. Onları soruya dönüştür.</strong><br>Örnek: Muhatap "Zaten bir CRM'imiz var" derse — Yanlış: "Bizimki daha iyi." — Doğru: "İlginç — başlangıçta onu neden seçtiniz?"</div>
+  </div>
+  <br>
+
+  <!-- Accordion -->
+  <div class="accordion">
+
+    <!-- OBJ 1 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="obj-num">01</div>
+        <div class="acc-header-text">
+          <div class="obj-quote lang-en">"I'm not interested."</div>
+          <div class="obj-quote lang-tr">"İlgilenmiyorum."</div>
+          <div class="obj-technique lang-en">Accept → Permission → Problem Question</div>
+          <div class="obj-technique lang-tr">Kabul Et → İzin Al → Problem Sorusu</div>
+        </div>
+        <span class="acc-chevron">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="obj-section">
+          <span class="obj-label label-dont lang-en">✗ Don't say</span>
+          <span class="obj-label label-dont lang-tr">✗ Deme</span>
+          <div class="script-line alt lang-en">"Can I tell you why people say that?" — this creates confrontation.</div>
+          <div class="script-line alt lang-tr">"İnsanların neden bunu söylediğini anlatabilir miyim?" — bu çatışma yaratır.</div>
+        </div>
+        <div class="obj-section">
+          <span class="obj-label label-do lang-en">✓ Pattern Interrupt + Response</span>
+          <span class="obj-label label-do lang-tr">✓ Kalıp Kırıcı + Cevap</span>
+          <div class="script-line key lang-en">"That's totally fair. Usually when people say that it just means it's not the right time. Can I ask you a quick question though?" → "How are you currently handling [render/CRM] right now?"</div>
+          <div class="script-line key lang-tr">"Bu çok adil. Genellikle insanlar bunu söylediğinde sadece zamanlamanın doğru olmadığı anlamına gelir. Yine de hızlı bir sorum olsa mı?" → "Şu an [render/CRM] sürecini nasıl yönetiyorsunuz?"</div>
+        </div>
+        <div class="obj-section">
+          <span class="obj-label label-why lang-en">Why it works</span>
+          <span class="obj-label label-why lang-tr">Neden işe yarar</span>
+          <div class="why-text lang-en">You remove pressure, then redirect to their situation. They feel heard, not sold to.</div>
+          <div class="why-text lang-tr">Baskıyı kaldırırsın, ardından durumlarına yönlendirirsin. Satıldıklarını değil, duyulduklarını hissederler.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OBJ 2 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="obj-num">02</div>
+        <div class="acc-header-text">
+          <div class="obj-quote lang-en">"Just send me an email."</div>
+          <div class="obj-quote lang-tr">"Bana bir e-posta gönderin."</div>
+          <div class="obj-technique lang-en">Turn the brush-off into a discovery moment</div>
+          <div class="obj-technique lang-tr">Savuşturmayı keşif anına dönüştür</div>
+        </div>
+        <span class="acc-chevron">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="obj-section">
+          <span class="obj-label label-dont lang-en">✗ Don't say</span>
+          <span class="obj-label label-dont lang-tr">✗ Deme</span>
+          <div class="script-line alt lang-en">"Sure, what's your email?" — conversation dies.</div>
+          <div class="script-line alt lang-tr">"Tabii, e-posta adresiniz nedir?" — konuşma biter.</div>
+        </div>
+        <div class="obj-section">
+          <span class="obj-label label-do lang-en">✓ Pattern Interrupt + Response</span>
+          <span class="obj-label label-do lang-tr">✓ Kalıp Kırıcı + Cevap</span>
+          <div class="script-line key lang-en">"Happy to send something over — just so I don't send you something irrelevant, can I ask one quick question first?" → "Are you currently using anything to manage [renders / sales pipeline / inventory]?"</div>
+          <div class="script-line key lang-tr">"Tabii gönderirim — alakasız bir şey göndermemek için önce hızlı bir soru sorabilir miyim?" → "Şu an [render / satış hattı / stok] yönetimi için bir şey kullanıyor musunuz?"</div>
+        </div>
+        <div class="obj-section">
+          <span class="obj-label label-why lang-en">Why it works</span>
+          <span class="obj-label label-why lang-tr">Neden işe yarar</span>
+          <div class="why-text lang-en">You turn a dead-end into a discovery moment. Most prospects will answer the question.</div>
+          <div class="why-text lang-tr">Çıkmaz sokağı keşif anına çevirirsin. Muhatabın çoğu soruyu yanıtlar.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OBJ 3 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="obj-num">03</div>
+        <div class="acc-header-text">
+          <div class="obj-quote lang-en">"We already use someone."</div>
+          <div class="obj-quote lang-tr">"Zaten birileriyle çalışıyoruz."</div>
+          <div class="obj-technique lang-en">Positive exaggeration → natural correction</div>
+          <div class="obj-technique lang-tr">Olumlu abartı → doğal düzeltme</div>
+        </div>
+        <span class="acc-chevron">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="obj-section">
+          <span class="obj-label label-dont lang-en">✗ Don't say</span>
+          <span class="obj-label label-dont lang-tr">✗ Deme</span>
+          <div class="script-line alt lang-en">Never attack the competitor. It creates defensiveness and you lose instantly.</div>
+          <div class="script-line alt lang-tr">Rakibi asla saldırma. Savunma yaratır ve anında kaybedersin.</div>
+        </div>
+        <div class="obj-section">
+          <span class="obj-label label-do lang-en">✓ Positive Exaggeration Technique</span>
+          <span class="obj-label label-do lang-tr">✓ Olumlu Abartı Tekniği</span>
+          <div class="script-line key lang-en">"That's actually great to hear. It sounds like you've probably found the perfect partner and everything is working exactly how you want it." [Pause — they often respond: "Well… not perfect."]</div>
+          <div class="script-line key lang-tr">"Bu aslında güzel. Sanırım mükemmel bir iş ortağı buldunuz ve her şey tam istediğiniz gibi işliyor." [Duraklat — genellikle şunu söylerler: "Yani… tam mükemmel değil."]</div>
+          <div class="script-line key lang-en">"Out of curiosity — what made you choose them originally?"</div>
+          <div class="script-line key lang-tr">"Meraktan soruyorum — başlangıçta onları neden seçtiniz?"</div>
+        </div>
+        <div class="obj-section">
+          <span class="obj-label label-why lang-en">Why it works</span>
+          <span class="obj-label label-why lang-tr">Neden işe yarar</span>
+          <div class="why-text lang-en">Humans naturally correct exaggerations. This technique reveals hidden dissatisfaction without confrontation.</div>
+          <div class="why-text lang-tr">İnsanlar doğal olarak abartıları düzeltir. Bu teknik çatışmadan gizli memnuniyetsizliği ortaya çıkarır.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OBJ 4 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="obj-num">04</div>
+        <div class="acc-header-text">
+          <div class="obj-quote lang-en">"We're not looking right now."</div>
+          <div class="obj-quote lang-tr">"Şu an aramıyoruz."</div>
+          <div class="obj-technique lang-en">Normalize → shift from selling to consulting</div>
+          <div class="obj-technique lang-tr">Normalleştir → satıcıdan danışmana geç</div>
+        </div>
+        <span class="acc-chevron">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="obj-section">
+          <span class="obj-label label-dont lang-en">✗ Don't say</span>
+          <span class="obj-label label-dont lang-tr">✗ Deme</span>
+          <div class="script-line alt lang-en">"But this could really help you…" — triggers defensive behavior.</div>
+          <div class="script-line alt lang-tr">"Ama bu gerçekten size yardımcı olabilir…" — savunma davranışını tetikler.</div>
+        </div>
+        <div class="obj-section">
+          <span class="obj-label label-do lang-en">✓ Normalize + Consulting Shift</span>
+          <span class="obj-label label-do lang-tr">✓ Normalleştir + Danışmanlık Geçişi</span>
+          <div class="script-line key lang-en">"That makes sense. Most companies aren't actively looking until something forces them to." [Pause.] "Out of curiosity — what usually causes companies in your position to start looking?"</div>
+          <div class="script-line key lang-tr">"Mantıklı. Çoğu firma bir şey zorlamadıkça aktif olarak arama yapmaz." [Duraklat.] "Meraktan soruyorum — sizin konumunuzdaki firmalar genellikle ne zaman aramaya başlıyor?"</div>
+        </div>
+        <div class="obj-section">
+          <span class="obj-label label-why lang-en">Why it works</span>
+          <span class="obj-label label-why lang-tr">Neden işe yarar</span>
+          <div class="why-text lang-en">You move from selling → consulting. They describe their own triggers, which gives you the roadmap to re-engage when the time comes.</div>
+          <div class="why-text lang-tr">Satıcıdan danışmana geçersin. Kendi tetikleyicilerini anlatırlar; bu da zamanı geldiğinde yeniden bağlantı kurmanın yol haritasını verir.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OBJ 5 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="obj-num">05</div>
+        <div class="acc-header-text">
+          <div class="obj-quote lang-en">"We don't have budget."</div>
+          <div class="obj-quote lang-tr">"Bütçemiz yok."</div>
+          <div class="obj-technique lang-en">Reframe the cost of inaction</div>
+          <div class="obj-technique lang-tr">Hareketsizliğin maliyetini yeniden çerçevele</div>
+        </div>
+        <span class="acc-chevron">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="obj-section">
+          <span class="obj-label label-do lang-en">✓ Reframe + Discovery</span>
+          <span class="obj-label label-do lang-tr">✓ Yeniden Çerçeveleme + Keşif</span>
+          <div class="script-line key lang-en">"Totally understandable. Most companies I speak with don't allocate budget until they realize what it's costing them NOT to fix it." [Pause.] "Out of curiosity — how are you currently handling the [model/render/CRM] situation today?"</div>
+          <div class="script-line key lang-tr">"Çok anlaşılır. Görüştüğüm firmaların çoğu, çözmemenin kendilerine ne kadara mal olduğunu fark edene kadar bütçe ayırmıyor." [Duraklat.] "Meraktan soruyorum — bugün [maket/render/CRM] durumunu nasıl yönetiyorsunuz?"</div>
+          <div class="script-line key lang-en">"Does that ever create challenges for the team?"</div>
+          <div class="script-line key lang-tr">"Bu ekip için zaman zaman sorunlar yaratıyor mu?"</div>
+        </div>
+        <div class="obj-section">
+          <span class="obj-label label-why lang-en">Why it works</span>
+          <span class="obj-label label-why lang-tr">Neden işe yarar</span>
+          <div class="why-text lang-en">Budget objections usually mean low perceived value. Don't fight it — reveal the hidden cost instead.</div>
+          <div class="why-text lang-tr">Bütçe itirazları genellikle düşük algılanan değer anlamına gelir. Bununla savaşma — bunun yerine gizli maliyeti ortaya çıkar.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OBJ 6 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="obj-num">06</div>
+        <div class="acc-header-text">
+          <div class="obj-quote lang-en">"Call me later."</div>
+          <div class="obj-quote lang-tr">"Sonra arayın."</div>
+          <div class="obj-technique lang-en">Pattern interrupt + one quick question before you go</div>
+          <div class="obj-technique lang-tr">Kalıp kırıcı + gitmeden önce hızlı soru</div>
+        </div>
+        <span class="acc-chevron">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="obj-section">
+          <span class="obj-label label-dont lang-en">✗ Don't say</span>
+          <span class="obj-label label-dont lang-tr">✗ Deme</span>
+          <div class="script-line alt lang-en">"Okay, when?" — gives away all control.</div>
+          <div class="script-line alt lang-tr">"Tamam, ne zaman?" — tüm kontrolü bırakırsın.</div>
+        </div>
+        <div class="obj-section">
+          <span class="obj-label label-do lang-en">✓ Pattern Interrupt Response</span>
+          <span class="obj-label label-do lang-tr">✓ Kalıp Kırıcı Cevap</span>
+          <div class="script-line key lang-en">"Sure — usually when people ask that it's because they're a bit busy right now. Would it be ridiculous if I asked you one quick question before I let you go?"</div>
+          <div class="script-line key lang-tr">"Tabii — genellikle insanlar bunu söylediğinde biraz meşgul oldukları anlamına gelir. Sizi bırakmadan önce bir hızlı soru sormam saçma olur mu?"</div>
+          <div class="stage-dir lang-en">→ Then ask a problem-based question. They almost always answer.</div>
+          <div class="stage-dir lang-tr">→ Ardından problem tabanlı bir soru sor. Neredeyse her zaman yanıtlarlar.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OBJ 7 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="obj-num">07</div>
+        <div class="acc-header-text">
+          <div class="obj-quote lang-en">"I'm not the right person."</div>
+          <div class="obj-quote lang-tr">"Ben doğru kişi değilim."</div>
+          <div class="obj-technique lang-en">Redirect + warm handoff</div>
+          <div class="obj-technique lang-tr">Yönlendir + sıcak geçiş</div>
+        </div>
+        <span class="acc-chevron">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="obj-section">
+          <span class="obj-label label-do lang-en">✓ Redirect Response</span>
+          <span class="obj-label label-do lang-tr">✓ Yönlendirme Cevabı</span>
+          <div class="script-line key lang-en">"No problem at all — I appreciate you telling me. Just so I don't waste anyone's time, who normally handles this on your team?"</div>
+          <div class="script-line key lang-tr">"Hiç sorun değil — söylediğiniz için teşekkür ederim. Kimsenin zamanını boşa harcamamak için, ekibinizde bunu genellikle kim yönetiyor?"</div>
+          <div class="script-line key lang-en">"Would it make sense to speak with them directly, or would you prefer to introduce me?"</div>
+          <div class="script-line key lang-tr">"Onlarla doğrudan görüşmek mi daha mantıklı olur, yoksa siz beni tanıştırmayı mı tercih edersiniz?"</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /accordion -->
+
+  <!-- Break Glass -->
+  <div class="break-glass" style="margin-top:16px;">
+    <div class="break-glass-title">🚨 <span class="lang-en">Break Glass — If They're About to Hang Up</span><span class="lang-tr">Son Çare — Kapatmak Üzereyse</span></div>
+    <div class="break-glass-text lang-en">Use this only when the conversation is truly dying and they're about to hang up:</div>
+    <div class="break-glass-text lang-tr">Bunu sadece konuşma gerçekten ölürken ve kapatmak üzereyken kullan:</div>
+    <div class="script-line key lang-en">"Can I ask one last question? If it's not relevant, I'll disappear forever."</div>
+    <div class="script-line key lang-tr">"Son bir soru sorabilir miyim? Alakalı değilse, sonsuza kadar kaybolacağım."</div>
+    <div class="why-text lang-en" style="margin-top:12px;">This removes all pressure completely. Most people can't resist answering one final question after you've committed to disappearing.</div>
+    <div class="why-text lang-tr" style="margin-top:12px;">Tüm baskıyı tamamen kaldırır. İnsanların çoğu, kaybolacağına söz verdikten sonra son bir soruya cevap vermekten kendini alamaz.</div>
+  </div>
+
+  <!-- Tonality Section -->
+  <div class="section-divider"></div>
+  <div class="section-heading lang-en">🎙️ Tonality Training</div>
+  <div class="section-heading lang-tr">🎙️ Tonalite Eğitimi</div>
+  <div class="section-sub lang-en">How you say it matters more than what you say. These 5 rules will transform your calls.</div>
+  <div class="section-sub lang-tr">Nasıl söylediğin, ne söylediğinden daha önemlidir. Bu 5 kural aramalarınızı dönüştürecek.</div>
+
+  <div class="tonality-grid">
+    <div class="tonality-card"><div class="tonality-icon">🐢</div><div class="tonality-title lang-en">Low & Slow</div><div class="tonality-title lang-tr">Alçak & Yavaş</div><div class="tonality-desc lang-en">Never rush. Speak 20% slower than feels natural. Breathe before answering.</div><div class="tonality-desc lang-tr">Asla aceleye getirme. Doğal hissettirenden %20 yavaş konuş. Cevap vermeden önce nefes al.</div></div>
+    <div class="tonality-card"><div class="tonality-icon">📉</div><div class="tonality-title lang-en">Downswing Statements</div><div class="tonality-title lang-tr">Düşen Tonlama</div><div class="tonality-desc lang-en">End statements with a downward tone — it sounds like you have the answer, not a question.</div><div class="tonality-desc lang-tr">Cümleleri düşen tonlamayla bitir — cevabın olduğu gibi görünür, soru gibi değil.</div></div>
+    <div class="tonality-card"><div class="tonality-icon">🤔</div><div class="tonality-title lang-en">Curious Tone</div><div class="tonality-title lang-tr">Meraklı Ton</div><div class="tonality-desc lang-en">On problem questions, sound genuinely curious — not interrogating. Like a doctor, not a detective.</div><div class="tonality-desc lang-tr">Problem sorularında gerçekten meraklı ses çıkar — sorgular gibi değil. Dedektif değil, doktor gibi.</div></div>
+    <div class="tonality-card"><div class="tonality-icon">🤝</div><div class="tonality-title lang-en">Warm but Certain</div><div class="tonality-title lang-tr">Sıcak ama Emin</div><div class="tonality-desc lang-en">Confident, not pushy. You believe in what you're offering — and you're doing them a favor by calling.</div><div class="tonality-desc lang-tr">Kendinden emin, ama baskıcı değil. Sunduğunuza inanıyorsun — ve arayarak onlara iyilik yapıyorsun.</div></div>
+    <div class="tonality-card"><div class="tonality-icon">⏸️</div><div class="tonality-title lang-en">Use Silence</div><div class="tonality-title lang-tr">Sessizliği Kullan</div><div class="tonality-desc lang-en">After asking a question — STOP TALKING. Silence creates tension that the prospect will fill.</div><div class="tonality-desc lang-tr">Soru sorduktan sonra — KONUŞMAYI BIRAKIN. Sessizlik, muhatabın dolduracağı gerilim yaratır.</div></div>
+  </div>
+
+  <div class="do-dont-table-wrap">
+    <table class="do-dont-table">
+      <thead><tr><th class="dont lang-en">✗ Say This Never</th><th class="dont lang-tr">✗ Asla Bunu Deme</th><th class="do lang-en">✓ Say This Instead</th><th class="do lang-tr">✓ Bunun Yerine Bunu De</th></tr></thead>
+      <tbody>
+        <tr><td class="dont lang-en">"I just wanted to…"</td><td class="dont lang-tr">"Sadece … istedim"</td><td class="do lang-en">"I'm calling because…"</td><td class="do lang-tr">"Arıyorum çünkü…"</td></tr>
+        <tr><td class="dont lang-en">"Does that make sense?"</td><td class="dont lang-tr">"Mantıklı mı?"</td><td class="do lang-en">"What's your take on that?"</td><td class="do lang-tr">"Buna bakışınız nasıl?"</td></tr>
+        <tr><td class="dont lang-en">"To be honest with you…"</td><td class="dont lang-tr">"Dürüst olmak gerekirse…"</td><td class="do lang-en">Just be honest — drop the filler</td><td class="do lang-tr">Sadece dürüst ol — dolgu kelimesini bırak</td></tr>
+        <tr><td class="dont lang-en">"Am I catching you at a bad time?"</td><td class="dont lang-tr">"Kötü bir zamanda mı yakaladım?"</td><td class="do lang-en">"Can I steal 30 seconds?"</td><td class="do lang-tr">"30 saniyenizi çalabilir miyim?"</td></tr>
+        <tr><td class="dont lang-en">Upspeak on every sentence?</td><td class="dont lang-tr">Her cümlede yükselen ton?</td><td class="do lang-en">Downswing. You have the answer.</td><td class="do lang-tr">Düşen ton. Cevabın var.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /tab2 -->
+
+<!-- ======================================================== TAB 3 -->
+<div id="tab3" class="tab-panel">
+  <div class="tab-header">
+    <div class="lang-en">
+      <div class="tab-badge">🤝 Partnership Outreach Script</div>
+      <h1 class="tab-title">Partnership Call Script</h1>
+      <p class="tab-subtitle">For architecture firms, real estate agencies, and marketing agencies. Goal: explore a long-term referral partnership.</p>
+    </div>
+    <div class="lang-tr">
+      <div class="tab-badge">🤝 Partnerlik Arama Scripti</div>
+      <h1 class="tab-title">Partnerlik Araması Scripti</h1>
+      <p class="tab-subtitle">Mimarlık ofisleri, gayrimenkul şirketleri ve pazarlama ajansları için. Hedef: uzun vadeli referans ortaklığını keşfet.</p>
+    </div>
+  </div>
+
+  <!-- Win-Win-Win -->
+  <div class="win-grid">
+    <div class="win-card"><div class="win-icon">🏢</div><div class="win-eyebrow lang-en">Partner Wins</div><div class="win-eyebrow lang-tr">Partner Kazanır</div><div class="win-title lang-en">New Revenue Stream</div><div class="win-title lang-tr">Yeni Gelir Akışı</div><div class="win-desc lang-en">Earn on every client you refer. Add tech value to your existing relationships.</div><div class="win-desc lang-tr">Her yönlendirdiğin müşteriden kazan. Mevcut ilişkilerine teknoloji değeri kat.</div></div>
+    <div class="win-card"><div class="win-icon">⚙️</div><div class="win-eyebrow lang-en">Configgo Wins</div><div class="win-eyebrow lang-tr">Configgo Kazanır</div><div class="win-title lang-en">Warm Introductions</div><div class="win-title lang-tr">Sıcak Tanıtımlar</div><div class="win-desc lang-en">Access to qualified projects through trusted local relationships.</div><div class="win-desc lang-tr">Güvenilir yerel ilişkiler aracılığıyla nitelikli projelere erişim.</div></div>
+    <div class="win-card"><div class="win-icon">🏗️</div><div class="win-eyebrow lang-en">Client Wins</div><div class="win-eyebrow lang-tr">Müşteri Kazanır</div><div class="win-title lang-en">Better Results</div><div class="win-title lang-tr">Daha İyi Sonuçlar</div><div class="win-desc lang-en">Sell faster, spend less on models, close with 3D interactive experiences.</div><div class="win-desc lang-tr">Daha hızlı sat, makete daha az harca, 3B interaktif deneyimlerle kapat.</div></div>
+  </div>
+
+  <!-- Target Audience -->
+  <div class="section-sub lang-en" style="margin-bottom:10px;">Target partners:</div>
+  <div class="section-sub lang-tr" style="margin-bottom:10px;">Hedef partnerler:</div>
+  <div class="target-tags">
+    <span class="target-tag featured lang-en">🏛️ Architecture Firms</span><span class="target-tag featured lang-tr">🏛️ Mimarlık Ofisleri</span>
+    <span class="target-tag featured lang-en">🏠 Real Estate Agencies</span><span class="target-tag featured lang-tr">🏠 Gayrimenkul Şirketleri</span>
+    <span class="target-tag featured lang-en">📣 Marketing Agencies</span><span class="target-tag featured lang-tr">📣 Pazarlama Ajansları</span>
+    <span class="target-tag">ACE Mimarlık</span>
+    <span class="target-tag">Ali Osman A Tasarım</span>
+    <span class="target-tag">Demay Mimarlık</span>
+    <span class="target-tag">Hattırlı Mimarlık</span>
+  </div>
+
+  <!-- Flow Stepper -->
+  <div class="flow-stepper" id="stepper-tab3">
+    <div class="flow-step current" data-step="0"><div class="flow-step-circle">1</div><div class="flow-step-text lang-en">Pattern Interrupt</div><div class="flow-step-text lang-tr">Giriş</div></div>
+    <div class="flow-connector"></div>
+    <div class="flow-step" data-step="1"><div class="flow-step-circle">2</div><div class="flow-step-text lang-en">DM Check</div><div class="flow-step-text lang-tr">Yetkili Kontrol</div></div>
+    <div class="flow-connector"></div>
+    <div class="flow-step" data-step="2"><div class="flow-step-circle">3</div><div class="flow-step-text lang-en">Why Them + Model</div><div class="flow-step-text lang-tr">Neden Onlar + Model</div></div>
+    <div class="flow-connector"></div>
+    <div class="flow-step" data-step="3"><div class="flow-step-circle">4</div><div class="flow-step-text lang-en">Book Meeting</div><div class="flow-step-text lang-tr">Toplantı Kur</div></div>
+  </div>
+
+  <!-- TP Controls -->
+  <div class="tp-controls">
+    <button class="tp-toggle" id="tp-btn-tab3" onclick="toggleTP('tab3')">▶ <span class="lang-en">Teleprompter Mode</span><span class="lang-tr">Teleprompter Modu</span></button>
+    <div class="tp-nav" id="tp-nav-tab3">
+      <button class="tp-nav-btn" id="tp-prev-tab3" onclick="tpMove('tab3',-1)" disabled>← <span class="lang-en">Prev</span><span class="lang-tr">Geri</span></button>
+      <span class="tp-counter" id="tp-count-tab3">1 / 4</span>
+      <button class="tp-nav-btn" id="tp-next-tab3" onclick="tpMove('tab3',1)"><span class="lang-en">Next</span><span class="lang-tr">İleri</span> →</button>
+    </div>
+  </div>
+
+  <div class="steps-container" id="steps-tab3">
+
+    <!-- P-STEP 1 -->
+    <div class="step tp-active" data-step-index="0">
+      <div class="step-header"><span class="step-num">01</span><h3 class="step-title lang-en">Intro & Pattern Interrupt</h3><h3 class="step-title lang-tr">Giriş & Desen Kırıcı</h3><span class="step-chip lang-en">30 seconds</span><span class="step-chip lang-tr">30 saniye</span></div>
+      <div class="step-body">
+        <div class="lang-en">
+          <div class="script-line key">"Hi [Name], good [morning/afternoon]. This is [Your Name] from Configgo Technology. Are you very busy right now, or do you have 30 seconds for a very quick intro?"</div>
+          <div class="stage-dir">💬 If they say they're very busy:</div>
+          <div class="script-line alt">"I totally understand — I'll keep it under a minute. If it sparks any interest, we can set up a proper call."</div>
+          <div class="script-line proof">"Quick background: Configgo is an Ankara-based tech company. We work with 30+ firms — including Nata Holding, Shelton, TR Holding, and Zirve Beton — and we help project developers market and sell faster using advanced 3D visualization and CRM tools. We recently opened a branch in Boston, USA."</div>
+        </div>
+        <div class="lang-tr">
+          <div class="script-line key">"Merhaba [İsim], iyi [sabahlar/günler]. Ben [Adınız], Configgo Technology'den arıyorum. Çok mu meşgulsünüz, yoksa çok kısa 30 saniyelik bir giriş yapabilir miyim?"</div>
+          <div class="stage-dir">💬 Çok meşgulüm derlerse:</div>
+          <div class="script-line alt">"Anlıyorum — çok kısa tutacağım. Eğer ilginizi çekerse, ayrıca bir görüşme planlayabiliriz."</div>
+          <div class="script-line proof">"Kısa bir arka plan: Configgo, Ankara merkezli bir teknoloji firması. Nata Holding, Shelton, TR Holding ve Zirve Beton dahil 30'dan fazla firma ile çalışıyoruz ve proje geliştiricilerin gelişmiş 3B görselleştirme ve CRM araçları kullanarak daha hızlı pazarlamasına ve satış yapmasına yardım ediyoruz. Kısa süre önce Boston, ABD'de de bir şube açtık."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P-STEP 2 -->
+    <div class="step" data-step-index="1">
+      <div class="step-header"><span class="step-num">02</span><h3 class="step-title lang-en">DM Check</h3><h3 class="step-title lang-tr">Yetkili Kişi Kontrolü</h3></div>
+      <div class="step-body">
+        <div class="lang-en">
+          <div class="script-line key">"By the way — for partnership discussions like this, are you the right person to speak with, or is there someone else on your team who handles this type of collaboration?"</div>
+          <div class="stage-dir">If someone else: "Great — I'll give you a quick overview, and if it seems interesting, we can plan a meeting with them as well, or separately."</div>
+        </div>
+        <div class="lang-tr">
+          <div class="script-line key">"Bu arada — bu tür partnerlik görüşmeleri için doğru kişi siz misiniz, yoksa ekibinizde bu tür iş birliklerine bakan başka biri mi var?"</div>
+          <div class="stage-dir">Başkası ise: "Harika — size hızlıca özetleyeyim; ilgi çekici gelirse o kişiyle birlikte ya da ayrı bir toplantı da planlayabiliriz."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P-STEP 3 -->
+    <div class="step" data-step-index="2">
+      <div class="step-header"><span class="step-num">03</span><h3 class="step-title lang-en">Why Them + Partnership Model</h3><h3 class="step-title lang-tr">Neden Onlar + Ortaklık Modeli</h3></div>
+      <div class="step-body">
+        <div class="lang-en">
+          <div class="script-line key">"The reason I'm reaching out specifically to you: among the selected architecture offices, real estate companies, and agencies in Ankara, we were particularly impressed by your vision and your recent projects. Especially [X project] — the quality of work you produced made us feel we could walk a long road together."</div>
+          <div class="script-line proof">"Here's what we thought: could we build a partnership where you bring our technology to your clients and projects in Ankara, and we handle all the technology, content production, and the rendering processes that drain your team — and we end up with a model where you win, we win, and the project owners win?"</div>
+        </div>
+        <div class="lang-tr">
+          <div class="script-line key">"Size özellikle ulaşmamızın sebebi: Ankara'daki seçili mimarlık ofisleri, gayrimenkul şirketleri ve ajanslar arasında özellikle sizin vizyonunuzu ve son projelerinizi beğendik. Özellikle [X projesi] — çıkardığınız işlerin kalitesi, sizlerle uzun yol yürüyebileceğimizi hissettirdi."</div>
+          <div class="script-line proof">"Şunu düşündük: Acaba böyle bir partnerlik kurabilir miyiz ki siz Ankara'daki projelerinize ve müşterilerinize bizim teknolojimizi götürün, biz de tüm teknolojiyi, içerikleri ve render sürecinde sizi yoran işleri çözüp destek sağlayalım — ve ortaya hem sizin, hem bizim, hem de proje sahiplerinin kazandığı bir model çıksın?"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P-STEP 4 -->
+    <div class="step" data-step-index="3">
+      <div class="step-header"><span class="step-num">04</span><h3 class="step-title lang-en">Book the Meeting</h3><h3 class="step-title lang-tr">Toplantı Kur</h3></div>
+      <div class="step-body">
+        <div class="lang-en">
+          <div class="script-line key">"All of this can't be decided in two or three minutes on the phone. For the first step, we'd just like to get to know each other better — lay your current project and client landscape in Ankara on the table, alongside our tech and business model details."</div>
+          <div class="script-line key">"How about a 15-minute online call in the coming days? For example, [Day] before noon, or [Day] afternoon — which fits your schedule better?"</div>
+          <div class="stage-dir">When confirmed: "I'm sending the meeting request right now. Will you confirm it?"</div>
+          <div class="script-line alt">"Thank you — sent. Looking forward to speaking. Have a great day!"</div>
+        </div>
+        <div class="lang-tr">
+          <div class="script-line key">"Bunların hepsi tabii telefonda iki üç dakikada karar verilecek şeyler değil. İlk adımda sadece birbirimizi daha iyi tanıyıp, Ankara'daki mevcut proje ve müşteri yapınızı ve bizim sağlayabildiğimiz teknoloji ile iş modeli detaylarını karşılıklı masaya koymak istiyoruz."</div>
+          <div class="script-line key">"Önümüzdeki günlerde 15 dakikalık kısa bir online görüşme yapsak? Mesela [Gün] öğleden önce mi, yoksa [Gün] öğleden sonrası mı daha uygun?"</div>
+          <div class="stage-dir">Onaylandığında: "Şu an size meeting için istek atıyorum. Onaylar mısınız?"</div>
+          <div class="script-line alt">"Teşekkürler — gönderdim. Görüşmek üzere, iyi çalışmalar!"</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Post-Call Checklist -->
+  <div class="checklist-card">
+    <div class="checklist-card-title">✅ <span class="lang-en">Post-Call Checklist</span><span class="lang-tr">Arama Sonrası Kontrol Listesi</span></div>
+    <div class="checklist-items" id="cl-tab3">
+      <label class="checklist-item"><div class="check-box"><span class="check-icon">✓</span></div><span class="check-text lang-en">Meeting invite sent and confirmed</span><span class="check-text lang-tr">Toplantı daveti gönderildi ve onaylandı</span></label>
+      <label class="checklist-item"><div class="check-box"><span class="check-icon">✓</span></div><span class="check-text lang-en">Company profile / portfolio looked up before the meeting</span><span class="check-text lang-tr">Toplantı öncesi firma profili / portföyü araştırıldı</span></label>
+      <label class="checklist-item"><div class="check-box"><span class="check-icon">✓</span></div><span class="check-text lang-en">Sent a brief intro email with Configgo overview</span><span class="check-text lang-tr">Configgo özeti içeren kısa bir tanıtım e-postası gönderildi</span></label>
+      <label class="checklist-item"><div class="check-box"><span class="check-icon">✓</span></div><span class="check-text lang-en">CRM updated with contact + next action</span><span class="check-text lang-tr">CRM iletişim bilgisi ve sonraki aksiyon ile güncellendi</span></label>
+    </div>
+  </div>
+</div><!-- /tab3 -->
+
+<!-- ======================================================== TAB 4 -->
+<div id="tab4" class="tab-panel">
+  <div class="tab-header">
+    <div class="lang-en">
+      <div class="tab-badge">📦 Products · FAQ · Competitors</div>
+      <h1 class="tab-title">Product Knowledge</h1>
+      <p class="tab-subtitle">Everything you need to answer prospect questions confidently and position Configgo against the competition.</p>
+    </div>
+    <div class="lang-tr">
+      <div class="tab-badge">📦 Ürünler · SSS · Rakipler</div>
+      <h1 class="tab-title">Ürün Bilgisi</h1>
+      <p class="tab-subtitle">Müşteri sorularını güvenle yanıtlamak ve Configgo'yu rekabete karşı konumlandırmak için ihtiyacınız olan her şey.</p>
+    </div>
+  </div>
+
+  <!-- Product Cards -->
+  <div class="section-heading lang-en">Our Products</div>
+  <div class="section-heading lang-tr">Ürünlerimiz</div>
+  <br>
+  <div class="product-grid">
+    <div class="product-card">
+      <div class="product-icon">🏛️</div>
+      <div class="product-name lang-en">Digital Twin</div>
+      <div class="product-name lang-tr">Dijital İkiz</div>
+      <div class="product-desc lang-en">Interactive 3D project tours with day/night simulation, weather effects, and material variations. Buyers explore every detail before a single brick is laid.</div>
+      <div class="product-desc lang-tr">Gün/gece simülasyonu, hava efektleri ve malzeme varyasyonları ile interaktif 3B proje turları. Alıcılar, tek bir tuğla konulmadan projenin her detayını keşfeder.</div>
+      <div class="product-stat">📈 <span class="lang-en">Decisions 3x faster</span><span class="lang-tr">3x daha hızlı karar</span></div>
+      <div class="product-features">
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">360° walkthrough from any angle</span><span class="lang-tr">Her açıdan 360° tur</span></div>
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">Day/night & weather simulation</span><span class="lang-tr">Gün/gece & hava simülasyonu</span></div>
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">Material & finish customization</span><span class="lang-tr">Malzeme & kaplama özelleştirme</span></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-icon">📊</div>
+      <div class="product-name lang-en">Sales CRM</div>
+      <div class="product-name lang-tr">Satış CRM</div>
+      <div class="product-desc lang-en">Full sales management — leads, inventory, contracts, reporting — all in one place. WhatsApp, SMS, and email built in. Designed specifically for real estate sales teams.</div>
+      <div class="product-desc lang-tr">Tam satış yönetimi — lead'ler, stok, sözleşmeler, raporlama — hepsi tek yerde. WhatsApp, SMS ve e-posta dahil. Özellikle gayrimenkul satış ekipleri için tasarlandı.</div>
+      <div class="product-stat">📈 <span class="lang-en">4–6 months ahead of targets</span><span class="lang-tr">4–6 ay erkenden hedefe ulaş</span></div>
+      <div class="product-features">
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">Lead tracking & pipeline management</span><span class="lang-tr">Lead takibi & boru hattı yönetimi</span></div>
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">Real-time inventory & pricing</span><span class="lang-tr">Gerçek zamanlı stok & fiyatlandırma</span></div>
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">WhatsApp / SMS / email CRM</span><span class="lang-tr">WhatsApp / SMS / e-posta CRM</span></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-icon">🎨</div>
+      <div class="product-name lang-en">3D Rendering</div>
+      <div class="product-name lang-tr">3B Render</div>
+      <div class="product-desc lang-en">Photorealistic architectural renders and animations delivered from early design drawings. Start selling before construction begins.</div>
+      <div class="product-desc lang-tr">İlk tasarım çizimlerinden teslim edilen fotogerçekçi mimari render ve animasyonlar. İnşaat başlamadan satışa başlayın.</div>
+      <div class="product-stat">💰 <span class="lang-en">Replaces ₺800K+ model budgets</span><span class="lang-tr">800K+ TL maket bütçesini sıfırlar</span></div>
+      <div class="product-features">
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">Photorealistic exterior & interior</span><span class="lang-tr">Fotogerçekçi dış cephe & iç mekan</span></div>
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">Animation walkthroughs</span><span class="lang-tr">Animasyonlu tanıtım videoları</span></div>
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">8 weeks earlier sales start</span><span class="lang-tr">8 hafta erken satış başlangıcı</span></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-icon">🌐</div>
+      <div class="product-name lang-en">Branding & Web</div>
+      <div class="product-name lang-tr">Marka & Web</div>
+      <div class="product-desc lang-en">Custom project websites, brand identity, and marketing collateral. Full-stack marketing support from Configgo's in-house creative team.</div>
+      <div class="product-desc lang-tr">Özel proje web siteleri, marka kimliği ve pazarlama materyalleri. Configgo'nun dahili kreatif ekibinden tam kapsamlı pazarlama desteği.</div>
+      <div class="product-stat">🎯 <span class="lang-en">Full-stack marketing support</span><span class="lang-tr">Tam kapsamlı pazarlama desteği</span></div>
+      <div class="product-features">
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">Project-specific website design</span><span class="lang-tr">Projeye özel web sitesi tasarımı</span></div>
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">Brand identity & logo</span><span class="lang-tr">Marka kimliği & logo</span></div>
+        <div class="product-feat"><div class="feat-dot"></div><span class="lang-en">Marketing materials & social content</span><span class="lang-tr">Pazarlama materyalleri & sosyal içerik</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section-heading lang-en">Frequently Asked Questions</div>
+  <div class="section-heading lang-tr">Sıkça Sorulan Sorular</div>
+  <div class="section-sub lang-en">Sales-ready answers to the questions prospects ask most.</div>
+  <div class="section-sub lang-tr">Müşterilerin en çok sorduğu sorulara satışa hazır cevaplar.</div>
+  <br>
+  <div class="faq-accordion">
+    <div class="faq-item"><div class="faq-header" onclick="toggleFaq(this)"><div class="faq-q lang-en">How is Configgo different from a regular 3D rendering company?</div><div class="faq-q lang-tr">Configgo normal bir 3B render şirketinden nasıl farklıdır?</div><span class="faq-chevron">▼</span></div><div class="faq-body lang-en">Most render companies give you images and that's it. Configgo combines a 3D digital twin — a fully interactive walkthrough — with a complete sales CRM. Your team manages leads, inventory, contracts, and reporting in the same platform where your clients explore the project. No competitor does this in a single platform.</div><div class="faq-body lang-tr">Çoğu render şirketi size görüntüler verir, bu kadar. Configgo, 3B dijital ikizi — tam interaktif bir gezi deneyimini — eksiksiz bir satış CRM'iyle birleştirir. Ekibiniz, müşterilerin projeyi keşfettiği aynı platformda lead'leri, stoku, sözleşmeleri ve raporlamayı yönetir. Hiçbir rakip bunu tek bir platformda sunmuyor.</div></div>
+    <div class="faq-item"><div class="faq-header" onclick="toggleFaq(this)"><div class="faq-q lang-en">Do we have to wait until construction is finished?</div><div class="faq-q lang-tr">İnşaat bitene kadar beklemek zorunda mıyız?</div><span class="faq-chevron">▼</span></div><div class="faq-body lang-en">No — that's the key advantage. You can start selling from the very first architectural drawings, before a single brick is laid. Shelton in Ankara started 8 weeks before their physical model was even ready.</div><div class="faq-body lang-tr">Hayır — bu en önemli avantaj. İlk mimari çizimlerden itibaren, tek bir tuğla konulmadan satışa başlayabilirsiniz. Ankara'daki Shelton, fiziksel maketleri hazır olmadan 8 hafta önce başladı.</div></div>
+    <div class="faq-item"><div class="faq-header" onclick="toggleFaq(this)"><div class="faq-q lang-en">How long does implementation take?</div><div class="faq-q lang-tr">Uygulama ne kadar sürer?</div><span class="faq-chevron">▼</span></div><div class="faq-body lang-en">Typically 4–6 weeks from design handoff to a live, interactive experience. Our team handles everything — you just provide the project files. There's no complex IT setup on your end.</div><div class="faq-body lang-tr">Tasarım tesliminden canlı, interaktif bir deneyime kadar genellikle 4–6 hafta. Ekibimiz her şeyi halleder — siz sadece proje dosyalarını sağlarsınız. Sizin tarafınızda karmaşık bir BT kurulumu yoktur.</div></div>
+    <div class="faq-item"><div class="faq-header" onclick="toggleFaq(this)"><div class="faq-q lang-en">How much does Configgo cost?</div><div class="faq-q lang-tr">Configgo'nun fiyatı nedir?</div><span class="faq-chevron">▼</span></div><div class="faq-body lang-en">Pricing is project-based and depends on scope. The 3D rendering and contract management system is included at no additional cost in many cases. Schedule a demo and we'll build a custom proposal tailored to your project size and volume.</div><div class="faq-body lang-tr">Fiyatlandırma proje bazlıdır ve kapsama göre değişir. 3B render ve sözleşme yönetim sistemi pek çok durumda ek maliyet olmaksızın dahildir. Bir demo planlayın ve proje büyüklüğünüze ve hacminize göre özel bir teklif hazırlayalım.</div></div>
+    <div class="faq-item"><div class="faq-header" onclick="toggleFaq(this)"><div class="faq-q lang-en">Can our sales team actually learn this quickly?</div><div class="faq-q lang-tr">Satış ekibimiz bunu hızlıca öğrenebilir mi?</div><span class="faq-chevron">▼</span></div><div class="faq-body lang-en">Yes — the CRM was designed for real estate sales people, not tech experts. Most teams are fully operational within their first week. We also provide onboarding support and training.</div><div class="faq-body lang-tr">Evet — CRM, teknoloji uzmanları için değil, gayrimenkul satış personeli için tasarlandı. Çoğu ekip ilk hafta içinde tam kapasite çalışıyor. Ayrıca işe alım desteği ve eğitim de sunuyoruz.</div></div>
+    <div class="faq-item"><div class="faq-header" onclick="toggleFaq(this)"><div class="faq-q lang-en">We already have a CRM — do we have to switch?</div><div class="faq-q lang-tr">Zaten bir CRM'imiz var — değiştirmek zorunda mıyız?</div><span class="faq-chevron">▼</span></div><div class="faq-body lang-en">Configgo's CRM was purpose-built for real estate sales, which means it handles things generic CRMs can't — like 3D tour integration, unit-level inventory, and sales office workflows. We recommend giving both a chance in a demo and seeing how they compare for your specific context.</div><div class="faq-body lang-tr">Configgo'nun CRM'i, gayrimenkul satışı için özel olarak oluşturulmuştur; bu da genel CRM'lerin yapamadığı şeyleri yapabileceği anlamına gelir — 3B tur entegrasyonu, birim düzeyinde stok ve satış ofisi iş akışları gibi. Her ikisine de demo sırasında şans vermenizi ve kendi bağlamınız için nasıl karşılaştırdıklarını görmenizi öneririz.</div></div>
+    <div class="faq-item"><div class="faq-header" onclick="toggleFaq(this)"><div class="faq-q lang-en">Can we see examples of real projects?</div><div class="faq-q lang-tr">Gerçek proje örneklerini görebilir miyiz?</div><span class="faq-chevron">▼</span></div><div class="faq-body lang-en">Absolutely — in the 15-minute demo we walk through live examples from projects in your city and sector. You'll see Shelton Ankara, Nata Holding, and others in real use.</div><div class="faq-body lang-tr">Kesinlikle — 15 dakikalık demoda şehrinizden ve sektörünüzden projelerden canlı örnekleri inceliyoruz. Shelton Ankara, Nata Holding ve diğerlerini gerçek kullanımda göreceksiniz.</div></div>
+    <div class="faq-item"><div class="faq-header" onclick="toggleFaq(this)"><div class="faq-q lang-en">Do customers need a special app or device?</div><div class="faq-q lang-tr">Müşterilerin özel bir uygulama veya cihaza ihtiyacı var mı?</div><span class="faq-chevron">▼</span></div><div class="faq-body lang-en">No. The interactive tour runs in any modern web browser — on desktop, tablet, or mobile. Nothing to download, nothing to install. A client can explore a project from their couch at midnight if they want to.</div><div class="faq-body lang-tr">Hayır. İnteraktif tur, masaüstü, tablet veya mobil cihazda herhangi bir modern web tarayıcısında çalışır. İndirilecek veya kurulacak bir şey yok. Bir müşteri isterse gece yarısı kanepesinden oturarak bir projeyi keşfedebilir.</div></div>
+  </div>
+
+  <!-- Testimonials -->
+  <div class="section-divider"></div>
+  <div class="section-heading lang-en">Client Testimonials</div>
+  <div class="section-heading lang-tr">Müşteri Referansları</div>
+  <div class="section-sub lang-en">Use these in follow-up emails and WhatsApp messages after calls.</div>
+  <div class="section-sub lang-tr">Aramalar sonrasında takip e-postalarında ve WhatsApp mesajlarında kullanın.</div>
+  <br>
+  <div class="testimonials-grid">
+    <div class="testimonial-card"><div class="quote-mark">"</div><div class="testimonial-text lang-en">After we started using Configgo, the time spent in the sales office decreased significantly. Since customers can explore the project in 3D, the decision process sped up; and we were able to meet with far more customers in the same time period.</div><div class="testimonial-text lang-tr">Configgo'yu kullanmaya başladıktan sonra satış ofisinde geçirdiğimiz süre ciddi şekilde azaldı. Müşteriler projeyi üç boyutlu olarak gezebildiği için karar süreci hızlandı; biz de aynı sürede çok daha fazla müşteriyle görüşebilir hale geldik.</div><div class="testimonial-author"><div class="author-avatar">ZB</div><div><div class="author-name">Zirve Beton</div><div class="author-role lang-en">Sales Manager · Construction</div><div class="author-role lang-tr">Satış Müdürü · İnşaat</div></div></div></div>
+    <div class="testimonial-card"><div class="quote-mark">"</div><div class="testimonial-text lang-en">With Configgo, investors in our Miami projects can understand the project in full detail without being physically present. Our lead quality increased and our sales cycle shortened by an average of three weeks.</div><div class="testimonial-text lang-tr">Miami'deki projelerimizde Configgo sayesinde yatırımcılar fiziksel olarak gelmeden projeyi tüm detaylarıyla anlayabiliyor. Lead kalitemiz arttı ve satış döngümüz ortalama üç hafta kısaldı.</div><div class="testimonial-author"><div class="author-avatar">SH</div><div><div class="author-name">Shelton</div><div class="author-role lang-en">General Manager · Real Estate Dev.</div><div class="author-role lang-tr">Genel Müdür · Gayrimenkul</div></div></div></div>
+    <div class="testimonial-card"><div class="quote-mark">"</div><div class="testimonial-text lang-en">Combining sales management with a 3D walkthrough experience in a single platform changed the rules of the game. Now we can see which customer spent how much time in which unit and shape our sales strategy based on that data.</div><div class="testimonial-text lang-tr">Satış yönetimi ile üç boyutlu gezilebilir deneyimi tek platformda sunmaları oyunun kurallarını değiştirdi. Artık hangi müşterinin hangi ünitede ne kadar vakit geçirdiğini görebiliyor, bu veriye göre satış stratejimizi şekillendirebiliyoruz.</div><div class="testimonial-author"><div class="author-avatar">GL</div><div><div class="author-name">Gallardo</div><div class="author-role lang-en">Marketing Director</div><div class="author-role lang-tr">Pazarlama Direktörü</div></div></div></div>
+    <div class="testimonial-card"><div class="quote-mark">"</div><div class="testimonial-text lang-en">With Configgo we moved our projects from 2D renders to a 3D, walkable sales experience. Sales teams can give customers a first-hand experience instead of explaining the same project over and over — this significantly increased both sales speed and team efficiency.</div><div class="testimonial-text lang-tr">Configgo ile projelerimizi iki boyutlu renderlardan çıkarıp üç boyutlu, gezilebilir bir satış deneyimine taşıdık. Satış ekipleri aynı projeyi defalarca anlatmak yerine müşteriye birebir deneyim yaşatabiliyor; bu da satış hızını ve ekip verimliliğini ciddi şekilde artırdı.</div><div class="testimonial-author"><div class="author-avatar">NA</div><div><div class="author-name">NATA Holding</div><div class="author-role lang-en">Sales & Project Dev. Manager</div><div class="author-role lang-tr">Satış & Proje Geliştirme Yöneticisi</div></div></div></div>
+    <div class="testimonial-card"><div class="quote-mark">"</div><div class="testimonial-text lang-en">Thanks to Configgo's 3D presentation and CRM infrastructure, we manage stock, unit and customer tracking from a single center. Being able to clearly see which customer is interested in which unit made our sales process much more controlled and predictable.</div><div class="testimonial-text lang-tr">Configgo'nun sunduğu üç boyutlu sunum ve CRM altyapısı sayesinde stok, daire ve müşteri takibini tek merkezden yönetiyoruz. Hangi müşterinin hangi daireyle ilgilendiğini net şekilde görebilmek, satış sürecimizi çok daha kontrollü ve öngörülebilir hale getirdi.</div><div class="testimonial-author"><div class="author-avatar">TR</div><div><div class="author-name">TR Invest</div><div class="author-role lang-en">Investment & Sales Director</div><div class="author-role lang-tr">Yatırım & Satış Direktörü</div></div></div></div>
+  </div>
+
+  <!-- Competitor Table -->
+  <div class="section-divider"></div>
+  <div class="section-heading lang-en">Competitive Landscape</div>
+  <div class="section-heading lang-tr">Rekabet Analizi</div>
+  <div class="section-sub lang-en">How Configgo stacks up. Our key differentiator: CRM + 3D + Contract management in ONE platform.</div>
+  <div class="section-sub lang-tr">Configgo'nun konumu. Temel farklılaştırıcımız: CRM + 3B + Sözleşme yönetimi TEK platformda.</div>
+  <br>
+  <div class="table-wrap">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th><span class="lang-en">Feature</span><span class="lang-tr">Özellik</span></th>
+          <th class="cfg-col">Configgo</th>
+          <th>Resimo</th>
+          <th>Vinode.io</th>
+          <th>TheRenderPros</th>
+          <th>3dapp.space</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="lang-en">CRM Integration</span><span class="lang-tr">CRM Entegrasyonu</span></td><td class="cfg-col yes">✓ Yes</td><td class="no">✗ No</td><td class="unkn">?</td><td class="no">✗ No</td><td class="no">✗ No</td></tr>
+        <tr><td><span class="lang-en">3D Digital Twin</span><span class="lang-tr">3B Dijital İkiz</span></td><td class="cfg-col yes">✓ Yes</td><td class="yes">✓ Yes</td><td class="yes">✓ Yes</td><td class="yes">✓ Yes</td><td class="yes">✓ Yes</td></tr>
+        <tr><td><span class="lang-en">Real-time Inventory</span><span class="lang-tr">Gerçek Zamanlı Stok</span></td><td class="cfg-col yes">✓ Yes</td><td class="no">✗ No</td><td class="unkn">?</td><td class="no">✗ No</td><td class="unkn">?</td></tr>
+        <tr><td><span class="lang-en">Off-Plan Sales Support</span><span class="lang-tr">Plan Öncesi Satış</span></td><td class="cfg-col yes">✓ Yes</td><td class="part">~ Partial</td><td class="unkn">?</td><td class="no">✗ No</td><td class="unkn">?</td></tr>
+        <tr><td><span class="lang-en">Turkey Market Focus</span><span class="lang-tr">Türkiye Odağı</span></td><td class="cfg-col yes">✓ Yes</td><td class="part">~ Partial</td><td class="unkn">?</td><td class="no">✗ No</td><td class="unkn">?</td></tr>
+        <tr><td><span class="lang-en">WhatsApp / SMS CRM</span><span class="lang-tr">WhatsApp / SMS CRM</span></td><td class="cfg-col yes">✓ Yes</td><td class="no">✗ No</td><td class="no">✗ No</td><td class="no">✗ No</td><td class="no">✗ No</td></tr>
+        <tr><td><span class="lang-en">Contract Management</span><span class="lang-tr">Sözleşme Yönetimi</span></td><td class="cfg-col yes">✓ Included</td><td class="no">✗ No</td><td class="no">✗ No</td><td class="no">✗ No</td><td class="no">✗ No</td></tr>
+        <tr><td><span class="lang-en">Free 3D Entry Tier</span><span class="lang-tr">Ücretsiz 3B Başlangıç</span></td><td class="cfg-col yes">✓ Yes</td><td class="no">✗ No</td><td class="no">✗ No</td><td class="no">✗ No</td><td class="no">✗ No</td></tr>
+        <tr><td><span class="lang-en">USA Presence</span><span class="lang-tr">ABD Varlığı</span></td><td class="cfg-col yes">✓ Boston</td><td class="yes">✓ Multi</td><td class="unkn">?</td><td class="yes">✓ US-based</td><td class="unkn">?</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /tab4 -->
+
+</main>
+</div><!-- /app-body -->
+
+<!-- ======================================================== QUICK REF MODAL -->
+<div class="qr-overlay" id="qr-overlay" onclick="closeQROutside(event)">
+  <div class="qr-panel">
+    <div class="qr-header">
+      <div class="qr-title lang-en">⚡ Quick Reference</div>
+      <div class="qr-title lang-tr">⚡ Hızlı Referans</div>
+      <button class="close-btn" onclick="closeQR()">✕</button>
+    </div>
+    <div class="qr-section-label lang-en">6-Step Call Flow</div>
+    <div class="qr-section-label lang-tr">6 Adımlı Arama Akışı</div>
+    <div class="qr-steps">
+      <div class="qr-step"><div class="qr-step-num">1</div><div class="qr-step-text lang-en">Pattern Interrupt — "Can I steal 30 seconds?"</div><div class="qr-step-text lang-tr">Desen Kırıcı — "30 saniyenizi çalabilir miyim?"</div></div>
+      <div class="qr-step"><div class="qr-step-num">2</div><div class="qr-step-text lang-en">Authority Check — Right person?</div><div class="qr-step-text lang-tr">Yetkili Kontrol — Doğru kişi mi?</div></div>
+      <div class="qr-step"><div class="qr-step-num">3</div><div class="qr-step-text lang-en">Problem Discovery — Render quality or budget?</div><div class="qr-step-text lang-tr">Problem Keşfi — Render kalitesi mi bütçe mi?</div></div>
+      <div class="qr-step"><div class="qr-step-num">4</div><div class="qr-step-text lang-en">Deepen Pain — How long? What's the cost?</div><div class="qr-step-text lang-tr">Derinleştir — Ne zamandır? Maliyeti ne?</div></div>
+      <div class="qr-step"><div class="qr-step-num">5</div><div class="qr-step-text lang-en">Social Proof — 40+ projects, Shelton ₺1M saved</div><div class="qr-step-text lang-tr">Sosyal Kanıt — 40+ proje, Shelton 1M TL tasarruf</div></div>
+      <div class="qr-step"><div class="qr-step-num">6</div><div class="qr-step-text lang-en">Book Meeting — Thu/Fri · Morning or afternoon?</div><div class="qr-step-text lang-tr">Toplantı — Per/Cum · Sabah mı öğleden sonra mı?</div></div>
+    </div>
+    <div class="qr-section-label lang-en">Top 3 Objection Pivots</div>
+    <div class="qr-section-label lang-tr">En Sık 3 İtiraz Pivotu</div>
+    <div class="qr-objections">
+      <div class="qr-obj"><div class="qr-obj-q lang-en">"Not interested"</div><div class="qr-obj-q lang-tr">"İlgilenmiyorum"</div><div class="qr-obj-a lang-en">→ "That's fair. Can I ask one quick question?"</div><div class="qr-obj-a lang-tr">→ "Anlaşılır. Hızlı bir sorum olsa mı?"</div></div>
+      <div class="qr-obj"><div class="qr-obj-q lang-en">"We use someone"</div><div class="qr-obj-q lang-tr">"Birileriyle çalışıyoruz"</div><div class="qr-obj-a lang-en">→ "Sounds like everything's perfect then?" [pause]</div><div class="qr-obj-a lang-tr">→ "Her şey mükemmel çalışıyor demek?" [duraklat]</div></div>
+      <div class="qr-obj"><div class="qr-obj-q lang-en">"No budget"</div><div class="qr-obj-q lang-tr">"Bütçemiz yok"</div><div class="qr-obj-a lang-en">→ "How much is it costing you NOT to fix it?"</div><div class="qr-obj-a lang-tr">→ "Çözmemek size ne kadara mal oluyor?"</div></div>
+    </div>
+  </div>
 </div>
 
-<script>
-  function loadJob(el, src) {
-    // Remove active from all
-    document.querySelectorAll('.job-item').forEach(i => i.classList.remove('active'));
-    // Set active
-    el.classList.add('active');
-    // Load iframe
-    document.getElementById('jobFrame').src = src;
-    // On mobile, scroll main into view
-    if (window.innerWidth <= 700) {
-      document.querySelector('.main').scrollIntoView({ behavior: 'smooth' });
-    }
-  }
-</script>
+<script src="scripts.js"></script>
 </body>
 </html>
